@@ -17,6 +17,9 @@ apply plugin: 'net.neoforged.gradle.mixin'
 version = mod_version
 group = mod_group_id
 
+// Sodium's NeoForge artifact (single source of truth, it is referenced twice below)
+def sodium_version = "mc1.21.1-0.8.13-neoforge"
+
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 repositories {
@@ -133,8 +136,8 @@ dependencies {
     /*implementation "maven.modrinth:embeddium:Na1PoLYF"
     compileOnly "maven.modrinth:oculus:1.20.1-1.6.15a"*/
 
-    implementation "maven.modrinth:sodium:mc1.21.1-0.6.13-neoforge"
-    implementation "maven.modrinth:iris:1.8.1+1.21.1-neoforge"
+    implementation "maven.modrinth:sodium:${sodium_version}"
+    implementation "maven.modrinth:iris:1.8.14-beta.1+1.21.1-neoforge"
 
     implementation "maven.modrinth:cloth-config:15.0.140+neoforge"
     implementation "maven.modrinth:pehkui:3.8.3+1.21-neoforge"
@@ -154,7 +157,9 @@ dependencies {
     implementation "maven.modrinth:oritech:0.16.2"
     implementation "maven.modrinth:architectury-api:13.0.8+neoforge"
     implementation "maven.modrinth:geckolib:DTo3uxPN"
-    implementation "maven.modrinth:stitch:4.0.1"
+    // "Stitch" is published on Modrinth under the slug "athena-ctm" (formerly Athena);
+    // the old "stitch" slug no longer resolves, which broke dependency resolution.
+    implementation "maven.modrinth:athena-ctm:4.0.1"
 
     // Create
     implementation "maven.modrinth:create:1.21.1-6.0.6"
@@ -162,6 +167,40 @@ dependencies {
     // Mekanism
     implementation "maven.modrinth:mekanism:10.7.14.79"
 }
+
+// Since 0.8.x the Sodium NeoForge distribution is a jar-in-jar wrapper: the classes that
+// ImmPtl patches live in a nested mod jar which Gradle does not expose on the compile
+// classpath (the 0.6.x distributions shipped their classes at the top level instead).
+// Extract the nested jars into the build directory and add them as compile-only deps.
+configurations {
+    sodiumNestedJars {
+        canBeConsumed = false
+        canBeResolved = true
+    }
+}
+
+dependencies {
+    sodiumNestedJars "maven.modrinth:sodium:${sodium_version}"
+}
+
+def sodiumNestedJarDir = layout.buildDirectory.dir("sodium-nested-jars")
+
+def extractSodiumNestedJars = tasks.register("extractSodiumNestedJars", Sync) {
+    from({
+        configurations.sodiumNestedJars.files.collectMany { outerJar ->
+            zipTree(outerJar).matching { include "META-INF/jarjar/*.jar" }.files
+        }
+    })
+    into sodiumNestedJarDir
+    eachFile { it.path = it.name }
+    includeEmptyDirs = false
+}
+
+dependencies {
+    compileOnly fileTree(sodiumNestedJarDir) { include "*.jar" }
+}
+
+tasks.named('compileJava').configure { dependsOn extractSodiumNestedJars }
 
 tasks.named('build').configure { dependsOn('jarJar') }
 

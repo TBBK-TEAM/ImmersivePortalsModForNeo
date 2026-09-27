@@ -136,7 +136,7 @@ dependencies {
     /*implementation "maven.modrinth:embeddium:Na1PoLYF"
     compileOnly "maven.modrinth:oculus:1.20.1-1.6.15a"*/
 
-    implementation "maven.modrinth:sodium:${sodium_version}"
+    // Sodium is added further down, from the extracted nested jars (see the comment there).
     implementation "maven.modrinth:iris:1.8.14-beta.1+1.21.1-neoforge"
 
     implementation "maven.modrinth:cloth-config:15.0.140+neoforge"
@@ -168,10 +168,21 @@ dependencies {
     implementation "maven.modrinth:mekanism:10.7.14.79"
 }
 
-// Since 0.8.x the Sodium NeoForge distribution is a jar-in-jar wrapper: the classes that
-// ImmPtl patches live in a nested mod jar which Gradle does not expose on the compile
-// classpath (the 0.6.x distributions shipped their classes at the top level instead).
-// Extract the nested jars into the build directory and add them as compile-only deps.
+// Sodium's NeoForge artifact is a jar-in-jar wrapper: the outer jar holds the platform/workaround
+// classes, and a nested jar holds the actual mod.
+//
+// Both declare mod id "sodium". Gradle does not put nested jars on the classpath, and in a dev run
+// FML's JarJar refuses to add the nested mod jar because its mod id collides with the wrapper's
+// ("Attempted to select a dependency jar for JarJar which was passed in as source: sodium"). The
+// result is a dev classpath with no Sodium classes at all, which breaks every Sodium and Iris mixin.
+//
+// Sodium's mixin configs (which live in the nested jar, and are declared by its mods.toml) also
+// target a handful of classes that only exist in the outer jar (e.g. Workarounds$Reference), so both
+// halves are needed. They are merged back into one complete "sodium" mod jar below; see the comment
+// on buildSodiumDevMod for why neither half works on its own.
+//
+// Production installs are unaffected: there JarJar works normally and the outer jar is the file the
+// user drops into mods/.
 configurations {
     sodiumNestedJars {
         canBeConsumed = false
@@ -196,11 +207,47 @@ def extractSodiumNestedJars = tasks.register("extractSodiumNestedJars", Sync) {
     includeEmptyDirs = false
 }
 
-dependencies {
-    compileOnly fileTree(sodiumNestedJarDir) { include "*.jar" }
+def sodiumNestedJarFiles = fileTree(sodiumNestedJarDir) { include "*.jar" }
+sodiumNestedJarFiles.builtBy(extractSodiumNestedJars)
+
+// Merge the two halves back into a single, complete Sodium mod:
+//   * the nested mod jar already ships mods.toml, both mixin configs and all 727 mod classes
+//   * the outer jar contributes the platform / workaround classes that sodium's own mixin configs
+//     reference (e.g. Workarounds$Reference)
+// Keeping them as two entries does not work: the nested jar alone is missing those classes, and the
+// outer jar cannot simply be added as a plain library because its classes are then invisible to the
+// class loader that applies the mixins.
+def sodiumDevModDir = layout.buildDirectory.dir("sodium-dev-mod")
+
+def buildSodiumDevMod = tasks.register("buildSodiumDevMod", Jar) {
+    archiveFileName = "sodium-dev-mod.jar"
+    destinationDirectory = sodiumDevModDir
+    dependsOn extractSodiumNestedJars
+
+    from({
+        zipTree(fileTree(sodiumNestedJarDir) { include "net.caffeinemc.sodium-neoforge-*-mod.jar" }.singleFile)
+    })
+
+    from({
+        configurations.sodiumNestedJars.files.collect { outerJar -> zipTree(outerJar) }
+    }) {
+        exclude "META-INF/**"
+    }
+
+    // the nested jar wins on the few classes both halves contain
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
-tasks.named('compileJava').configure { dependsOn extractSodiumNestedJars }
+def sodiumDevModFiles = fileTree(sodiumDevModDir) { include "*.jar" }
+sodiumDevModFiles.builtBy(buildSodiumDevMod)
+
+def sodiumFabricApiFiles = fileTree(sodiumNestedJarDir) { include "fabric-*.jar" }
+sodiumFabricApiFiles.builtBy(extractSodiumNestedJars)
+
+dependencies {
+    implementation sodiumDevModFiles
+    implementation sodiumFabricApiFiles
+}
 
 tasks.named('build').configure { dependsOn('jarJar') }
 

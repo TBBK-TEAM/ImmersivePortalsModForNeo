@@ -6,6 +6,7 @@ import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.Registry;
@@ -29,6 +30,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import qouteall.imm_ptl.core.IPGlobal;
+import qouteall.imm_ptl.core.McHelper;
 import qouteall.imm_ptl.core.commands.PortalCommand;
 import qouteall.imm_ptl.peripheral.platform_specific.PeripheralModEntry;
 
@@ -208,6 +210,27 @@ public class CommandStickItem extends Item {
             player.getInventory().add(itemStack);
             player.inventoryMenu.broadcastChanges();
         });
+    }
+
+    /**
+     * Value reported through the {@code immersive_portals:command_stick_model} item property, which
+     * selects the variant's model in {@code models/item/command_stick.json}. See
+     * {@link CommandStickModelMapping} for the index table.
+     */
+    public static int getModelIndex(ItemStack stack) {
+        Data data = stack.get(COMPONENT_TYPE);
+        if (data == null) {
+            return 0;
+        }
+        return CommandStickModelMapping.getModelIndex(data.command());
+    }
+
+    public static void initClient() {
+        ItemProperties.register(
+            instance,
+            McHelper.newResourceLocation("immersive_portals:command_stick_model"),
+            (stack, level, entity, seed) -> getModelIndex(stack)
+        );
     }
     
     public static void addIntoCreativeTag(CreativeModeTab.Output entries) {

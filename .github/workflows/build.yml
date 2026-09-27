@@ -6,6 +6,12 @@ on:
     tags: ['v*']
   pull_request:
     branches: [1.21]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g. v6.0.10), leave empty for branch build only'
+        required: false
+        type: string
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -42,13 +48,17 @@ jobs:
   release:
     name: Create GitHub Release
     needs: build
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: >
+      (startsWith(github.ref, 'refs/tags/v') && github.event_name != 'workflow_dispatch')
+      || (github.event_name == 'workflow_dispatch' && inputs.tag != '')
     permissions:
       contents: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag != '' && format('refs/tags/{0}', github.event.inputs.tag) || github.ref }}
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -59,6 +69,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ github.event.inputs.tag != '' && github.event.inputs.tag || github.ref_name }}
           files: build/libs/*.jar
           body_path: changelog.md
           generate_release_notes: false

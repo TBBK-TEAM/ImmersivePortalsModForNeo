@@ -217,25 +217,65 @@ sodiumNestedJarFiles.builtBy(extractSodiumNestedJars)
 // Keeping them as two entries does not work: the nested jar alone is missing those classes, and the
 // outer jar cannot simply be added as a plain library because its classes are then invisible to the
 // class loader that applies the mixins.
+//
+// The merge is done in doLast with java.util.zip on purpose. Doing it declaratively needs the
+// extracted nested jar, and any read of that directory (e.g. fileTree(..).singleFile) is evaluated
+// while Gradle determines task dependencies - before the extraction task has run - so a clean
+// checkout fails with "Expected directory ... to contain exactly one file". A build that only works
+// on a machine where the directory happens to exist already is worse than useless.
 def sodiumDevModDir = layout.buildDirectory.dir("sodium-dev-mod")
+def sodiumDevModJar = sodiumDevModDir.map { it.file("sodium-dev-mod.jar") }
 
-def buildSodiumDevMod = tasks.register("buildSodiumDevMod", Jar) {
-    archiveFileName = "sodium-dev-mod.jar"
-    destinationDirectory = sodiumDevModDir
+def buildSodiumDevMod = tasks.register("buildSodiumDevMod") {
+    group = 'build'
+    description = 'Merges the Sodium jar-in-jar wrapper and its nested mod jar into one dev mod jar'
+
     dependsOn extractSodiumNestedJars
+    inputs.files(configurations.sodiumNestedJars)
+    inputs.dir(sodiumNestedJarDir)
+    outputs.file(sodiumDevModJar)
 
-    from({
-        zipTree(fileTree(sodiumNestedJarDir) { include "net.caffeinemc.sodium-neoforge-*-mod.jar" }.singleFile)
-    })
+    doLast {
+        def nestedDir = sodiumNestedJarDir.get().asFile
+        def innerJar = (nestedDir.listFiles() ?: []).find {
+            it.name.startsWith("net.caffeinemc.sodium-neoforge-") && it.name.endsWith("-mod.jar")
+        }
+        if (innerJar == null) {
+            throw new GradleException("nested Sodium mod jar not found in ${nestedDir}")
+        }
 
-    from({
-        configurations.sodiumNestedJars.files.collect { outerJar -> zipTree(outerJar) }
-    }) {
-        exclude "META-INF/**"
+        def outFile = sodiumDevModJar.get().asFile
+        outFile.parentFile.mkdirs()
+
+        // inner first so it wins on the few classes both halves contain
+        def sources = [[file: innerJar, keepMetaInf: true], [file: configurations.sodiumNestedJars.singleFile, keepMetaInf: false]]
+        def seen = new HashSet<String>()
+        def count = 0
+
+        new java.util.zip.ZipOutputStream(new FileOutputStream(outFile)).withCloseable { zos ->
+            sources.each { source ->
+                new java.util.zip.ZipFile(source.file).withCloseable { zf ->
+                    zf.entries().each { entry ->
+                        if (entry.isDirectory()) {
+                            return
+                        }
+                        if (!source.keepMetaInf && entry.name.startsWith("META-INF/")) {
+                            return
+                        }
+                        if (!seen.add(entry.name)) {
+                            return
+                        }
+                        zos.putNextEntry(new java.util.zip.ZipEntry(entry.name))
+                        zf.getInputStream(entry).withCloseable { input -> input.transferTo(zos) }
+                        zos.closeEntry()
+                        count++
+                    }
+                }
+            }
+        }
+
+        logger.lifecycle("Merged Sodium dev mod: ${outFile.name} (${count} entries, ${outFile.length()} bytes)")
     }
-
-    // the nested jar wins on the few classes both halves contain
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 def sodiumDevModFiles = fileTree(sodiumDevModDir) { include "*.jar" }

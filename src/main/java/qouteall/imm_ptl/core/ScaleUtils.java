@@ -149,7 +149,7 @@ public class ScaleUtils {
         if (!entity.level().isClientSide && isScaleIllegal(newScale)) {
             newScale = 1;
             entity.sendSystemMessage(
-                Component.literal("Scale out of range")
+                Component.translatable("imm_ptl.msg.scale_out_of_range")
             );
         }
         

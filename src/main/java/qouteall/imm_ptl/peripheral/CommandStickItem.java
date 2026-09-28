@@ -144,7 +144,7 @@ public class CommandStickItem extends Item {
             commandManager.performPrefixedCommand(commandSource, command);
         }
         else {
-            sendMessage(player, Component.literal("No Permission"));
+            sendMessage(player, Component.translatable("imm_ptl.msg.no_permission"));
         }
     }
     

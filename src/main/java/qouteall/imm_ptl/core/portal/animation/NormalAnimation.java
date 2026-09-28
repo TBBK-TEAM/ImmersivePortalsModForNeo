@@ -51,7 +51,7 @@ public class NormalAnimation implements PortalAnimationDriver {
         }
         
         public Component getInfo() {
-            return Component.literal("Phase(%d,".formatted(durationTicks))
+            return Component.translatable("imm_ptl.msg.animation.phase", durationTicks)
                 .append(delta.toString())
                 .append(")");
         }
@@ -353,13 +353,16 @@ public class NormalAnimation implements PortalAnimationDriver {
     
     @Override
     public Component getInfo() {
-        MutableComponent component = Component.literal("Normal[\n");
+        MutableComponent component = Component.translatable("imm_ptl.msg.animation.normal");
         for (Phase phase : phases) {
             component.append(" ");
             component.append(phase.getInfo());
             component.append("\n");
         }
-        component.append("] %s times".formatted(loopCount >= INFINITE_THRESHOLD ? "∞" : loopCount));
+        component.append(Component.translatable(
+            "imm_ptl.msg.animation.times",
+            loopCount >= INFINITE_THRESHOLD ? "\u221e" : String.valueOf(loopCount)
+        ));
         return component;
     }
 }

@@ -80,7 +80,7 @@ public class PortalWandInteraction {
             }
             
             if (!draggingInfo.isValid()) {
-                player.sendSystemMessage(Component.literal("Invalid dragging info"));
+                player.sendSystemMessage(Component.translatable("imm_ptl.wand.invalid_dragging_info"));
                 LOGGER.error("Invalid dragging info {}", draggingInfo);
                 return;
             }
@@ -148,19 +148,19 @@ public class PortalWandInteraction {
         Vec3 firstSideVerticalUnitAxis = firstSideVerticalAxis.normalize();
         
         if (Math.abs(firstSideWidth) < 0.001 || Math.abs(firstSideHeight) < 0.001) {
-            player.sendSystemMessage(Component.literal("The first side is too small"));
+            player.sendSystemMessage(Component.translatable("imm_ptl.wand.first_side_too_small"));
             LOGGER.error("The first side is too small");
             return;
         }
         
         if (firstSideHorizontalUnitAxis.dot(firstSideVerticalUnitAxis) > 0.001) {
-            player.sendSystemMessage(Component.literal("The horizontal and vertical axis are not perpendicular in first side"));
+            player.sendSystemMessage(Component.translatable("imm_ptl.wand.first_side_not_perpendicular"));
             LOGGER.error("The horizontal and vertical axis are not perpendicular in first side");
             return;
         }
         
         if (firstSideWidth > SIZE_LIMIT || firstSideHeight > SIZE_LIMIT) {
-            player.sendSystemMessage(Component.literal("The first side is too large"));
+            player.sendSystemMessage(Component.translatable("imm_ptl.wand.first_side_too_large"));
             LOGGER.error("The first side is too large");
             return;
         }
@@ -173,25 +173,25 @@ public class PortalWandInteraction {
         Vec3 secondSideVerticalUnitAxis = secondSideVerticalAxis.normalize();
         
         if (Math.abs(secondSideWidth) < 0.001 || Math.abs(secondSideHeight) < 0.001) {
-            player.sendSystemMessage(Component.literal("The second side is too small"));
+            player.sendSystemMessage(Component.translatable("imm_ptl.wand.second_side_too_small"));
             LOGGER.error("The second side is too small");
             return;
         }
         
         if (secondSideHorizontalUnitAxis.dot(secondSideVerticalUnitAxis) > 0.001) {
-            player.sendSystemMessage(Component.literal("The horizontal and vertical axis are not perpendicular in second side"));
+            player.sendSystemMessage(Component.translatable("imm_ptl.wand.second_side_not_perpendicular"));
             LOGGER.error("The horizontal and vertical axis are not perpendicular in second side");
             return;
         }
         
         if (secondSideWidth > SIZE_LIMIT || secondSideHeight > SIZE_LIMIT) {
-            player.sendSystemMessage(Component.literal("The second side is too large"));
+            player.sendSystemMessage(Component.translatable("imm_ptl.wand.second_side_too_large"));
             LOGGER.error("The second side is too large");
             return;
         }
         
         if (Math.abs((firstSideHeight / firstSideWidth) - (secondSideHeight / secondSideWidth)) > 0.001) {
-            player.sendSystemMessage(Component.literal("The two sides have different aspect ratio"));
+            player.sendSystemMessage(Component.translatable("imm_ptl.wand.different_aspect_ratio"));
             LOGGER.error("The two sides have different aspect ratio");
             return;
         }
@@ -482,13 +482,13 @@ public class PortalWandInteraction {
             portal.rectifyClusterPortals(true);
         }
         else {
-            player.sendSystemMessage(Component.literal("Invalid dragging"));
+            player.sendSystemMessage(Component.translatable("imm_ptl.wand.drag_failed"));
         }
     }
     
     private static boolean checkPermission(ServerPlayer player) {
         if (!canPlayerUsePortalWand(player)) {
-            player.sendSystemMessage(Component.literal("You cannot use portal wand"));
+            player.sendSystemMessage(Component.translatable("imm_ptl.wand.no_permission"));
             LOGGER.error("Player cannot use portal wand {}", player);
             return false;
         }
@@ -764,7 +764,7 @@ public class PortalWandInteraction {
         Portal portal = WandUtil.getPortalByUUID(player.level(), portalId);
         
         if (portal == null) {
-            player.sendSystemMessage(Component.literal("Cannot find portal " + portalId));
+            player.sendSystemMessage(Component.translatable("imm_ptl.wand.portal_not_found", portalId));
             return;
         }
         
@@ -810,14 +810,14 @@ public class PortalWandInteraction {
         CopyingSession copyingSession = copyingSessionMap.remove(player);
         
         if (copyingSession == null) {
-            player.sendSystemMessage(Component.literal("Missing copying session"));
+            player.sendSystemMessage(Component.translatable("imm_ptl.wand.missing_copying_session"));
             return;
         }
         
         DQuaternion orientation = rawOrientation.fixFloatingPointErrorAccumulation();
         
         if (player.position().distanceToSqr(origin) > 64 * 64) {
-            player.sendSystemMessage(Component.literal("Too far away from the portal"));
+            player.sendSystemMessage(Component.translatable("imm_ptl.wand.too_far_away"));
             return;
         }
         

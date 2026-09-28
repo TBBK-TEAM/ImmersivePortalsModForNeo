@@ -28,7 +28,7 @@ public class AxisArgumentType implements ArgumentType<Direction.Axis> {
     
     public static final DynamicCommandExceptionType exceptionType =
         new DynamicCommandExceptionType(object ->
-            Component.literal("Invalid Axis " + object)
+            Component.translatable("imm_ptl.msg.invalid_axis", object)
         );
     
     public static <S> Direction.Axis getAxis(CommandContext<S> context, String argName) {

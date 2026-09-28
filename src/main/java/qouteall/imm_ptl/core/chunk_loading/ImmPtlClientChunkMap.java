@@ -189,11 +189,12 @@ public class ImmPtlClientChunkMap extends ClientChunkCache {
             );
             CHelper.printChat(
                 Component
-                    .literal("Failed to deserialize chunk packet. %s %s %s".formatted(
+                    .translatable(
+                        "imm_ptl.msg.chunk_packet_deserialize_failed",
                         worldChunk.getLevel().dimension().location(),
                         worldChunk.getPos().x, worldChunk.getPos().z
-                    ))
-                    .append(Component.literal(" Report issue:"))
+                    )
+                    .append(Component.translatable("imm_ptl.msg.report_issue"))
                     .append(McHelper.getLinkText(O_O.getIssueLink()))
                     .withStyle(ChatFormatting.RED)
             );

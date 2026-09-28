@@ -3,6 +3,7 @@ package qouteall.imm_ptl.core.compat.iris_compatibility;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForge;
 import org.apache.commons.lang3.Validate;
@@ -136,9 +137,7 @@ public class IrisPortalRenderer extends PortalRenderer {
             int errorCode = GL11.glGetError();
             if (errorCode != GL_NO_ERROR) {
                 IPGlobal.renderMode = IPGlobal.RenderMode.compatibility;
-                CHelper.printChat("[Immersive Portals]" +
-                    "Switched to compatibility portal rendering mode." +
-                    " Portal-in-portal wont' be rendered");
+                CHelper.printChat(Component.translatable("imm_ptl.msg.switched_to_compatibility_mode"));
             }
             
             initStencilForLayer(portalLayer);

@@ -545,7 +545,7 @@ public class PortalAnimation {
         List<PortalAnimationDriver> l1 = reverse ? otherSideAnimations : thisSideAnimations;
         List<PortalAnimationDriver> l2 = reverse ? thisSideAnimations : otherSideAnimations;
         
-        component.append(Component.literal("This Side:\n"));
+        component.append(Component.translatable("imm_ptl.msg.animation.this_side"));
         for (int i = 0; i < l1.size(); i++) {
             PortalAnimationDriver animation = l1.get(i);
             component.append(
@@ -556,7 +556,7 @@ public class PortalAnimation {
             );
         }
         
-        component.append(Component.literal("Other Side:\n"));
+        component.append(Component.translatable("imm_ptl.msg.animation.other_side"));
         for (int i = 0; i < l2.size(); i++) {
             PortalAnimationDriver animation = l2.get(i);
             component.append(

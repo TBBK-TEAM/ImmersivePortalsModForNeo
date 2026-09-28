@@ -109,7 +109,7 @@ public class LoadingIndicatorEntity extends Entity {
     
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        builder.define(TEXT, Component.literal("Loading..."));
+        builder.define(TEXT, Component.translatable("imm_ptl.msg.loading"));
         builder.define(BOX_LOW_POS, BlockPos.ZERO);
         builder.define(BOX_HIGH_POS, BlockPos.ZERO);
     }

@@ -352,7 +352,7 @@ public class PortalCommand {
                 
                 if (portal == null) {
                     context.getSource().sendSuccess(() ->
-                            Component.literal("You are not pointing to any portal"),
+                            Component.translatable("imm_ptl.msg.not_pointing_to_portal"),
                         false
                     );
                     return 0;
@@ -360,7 +360,7 @@ public class PortalCommand {
                 
                 if (!portal.getIsGlobal()) {
                     context.getSource().sendSuccess(() ->
-                            Component.literal("You are not pointing to a global portal"),
+                            Component.translatable("imm_ptl.msg.not_pointing_to_global_portal"),
                         false
                     );
                     return 0;
@@ -368,7 +368,7 @@ public class PortalCommand {
                 
                 if (player.position().distanceTo(portal.getOriginPos()) > 64) {
                     context.getSource().sendSuccess(() ->
-                            Component.literal("You are too far away from the portal's center " + portal),
+                            Component.translatable("imm_ptl.msg.too_far_from_portal_center", portal),
                         false
                     );
                     return 0;
@@ -387,7 +387,7 @@ public class PortalCommand {
                 
                 if (portal == null) {
                     context.getSource().sendSuccess(() ->
-                            Component.literal("You are not pointing to any portal"),
+                            Component.translatable("imm_ptl.msg.not_pointing_to_portal"),
                         false
                     );
                     return 0;
@@ -395,7 +395,7 @@ public class PortalCommand {
                 
                 if (!portal.getIsGlobal()) {
                     context.getSource().sendSuccess(() ->
-                            Component.literal("You are not pointing to a global portal"),
+                            Component.translatable("imm_ptl.msg.not_pointing_to_global_portal"),
                         false
                     );
                     return 0;
@@ -922,7 +922,7 @@ public class PortalCommand {
                     int index = IntegerArgumentType.getInteger(context, "indexStartingFromZero");
                     
                     if (index >= portal.getCommandsOnTeleported().size()) {
-                        context.getSource().sendFailure(Component.literal("Index out of range"));
+                        context.getSource().sendFailure(Component.translatable("imm_ptl.msg.index_out_of_range"));
                         return;
                     }
                     
@@ -947,7 +947,7 @@ public class PortalCommand {
                         int index = IntegerArgumentType.getInteger(context, "indexStartingFromZero");
                         
                         if (index >= portal.getCommandsOnTeleported().size()) {
-                            context.getSource().sendFailure(Component.literal("Index out of range"));
+                            context.getSource().sendFailure(Component.translatable("imm_ptl.msg.index_out_of_range"));
                             return;
                         }
                         
@@ -1657,13 +1657,13 @@ public class PortalCommand {
                         
                         if (!(e1 instanceof Portal)) {
                             context.getSource().sendFailure(
-                                Component.literal("portal1 is not a portal entity"));
+                                Component.translatable("imm_ptl.msg.portal1_not_portal_entity"));
                             return 0;
                         }
                         
                         if (!(e2 instanceof Portal)) {
                             context.getSource().sendFailure(
-                                Component.literal("portal2 is not a portal entity"));
+                                Component.translatable("imm_ptl.msg.portal2_not_portal_entity"));
                             return 0;
                         }
                         
@@ -1708,7 +1708,7 @@ public class PortalCommand {
                                         portal.setRotationTransformationD(portal.getRotationD().hamiltonProduct(quaternion.getConjugated()));
                                     }
                                     else {
-                                        context.getSource().sendFailure(Component.literal("the entity is not a portal"));
+                                        context.getSource().sendFailure(Component.translatable("imm_ptl.msg.not_a_portal_entity"));
                                     }
                                 }
                                 
@@ -1757,7 +1757,7 @@ public class PortalCommand {
                                     }
                                 }
                                 else {
-                                    context.getSource().sendFailure(Component.literal("the entity is not a portal"));
+                                    context.getSource().sendFailure(Component.translatable("imm_ptl.msg.not_a_portal_entity"));
                                 }
                             }
                             
@@ -1800,7 +1800,7 @@ public class PortalCommand {
                             portal.setDestinationDimension(context.getSource().getLevel().dimension());
                             
                             if (portal.getWidth() > 64 || portal.getHeight() > 64) {
-                                context.getSource().sendFailure(Component.literal("portal size is too large"));
+                                context.getSource().sendFailure(Component.translatable("imm_ptl.msg.portal_size_too_large"));
                                 return 0;
                             }
                             
@@ -1917,7 +1917,7 @@ public class PortalCommand {
                         128
                     );
                     if (airCube == null) {
-                        feedbackSender.accept(Component.literal("Cannot find space for placing room"));
+                        feedbackSender.accept(Component.translatable("imm_ptl.msg.cannot_find_space_for_room"));
                         return;
                     }
                     airCube = airCube.getSubBoxInCenter(roomAreaSize);
@@ -1963,7 +1963,7 @@ public class PortalCommand {
                     McHelper.spawnServerEntity(reversePortal);
                 });
                 
-                feedbackSender.accept(Component.literal("finished"));
+                feedbackSender.accept(Component.translatable("imm_ptl.msg.finished"));
             })
         ));
     }
@@ -2381,8 +2381,7 @@ public class PortalCommand {
             
             if (portal == null) {
                 source.sendSuccess(() ->
-                        Component.literal("You are not pointing to any non-global portal." +
-                            " (This command cannot process global portals)"),
+                        Component.translatable("imm_ptl.msg.not_pointing_to_non_global_portal"),
                     false
                 );
                 return 0;
@@ -2598,7 +2597,7 @@ public class PortalCommand {
         CommandContext<CommandSourceStack> context, Portal portal
     ) {
         if (portal instanceof Mirror) {
-            context.getSource().sendFailure(Component.literal("This command targets non-mirror portals"));
+            context.getSource().sendFailure(Component.translatable("imm_ptl.msg.targets_non_mirror_portals"));
             return;
         }
         
@@ -2673,7 +2672,7 @@ public class PortalCommand {
         
         ObjectArrayList<AABB> boxes = gatherCollisionBoxesTouching(portal);
         if (boxes.size() > 40000) {
-            context.getSource().sendFailure(Component.literal("Too many collision boxes to sculpt"));
+            context.getSource().sendFailure(Component.translatable("imm_ptl.msg.too_many_collision_boxes"));
             return;
         }
         
@@ -2728,7 +2727,7 @@ public class PortalCommand {
                 portal.setPortalShapeToDefault();
                 if (player != null) {
                     player.sendSystemMessage(
-                        Component.literal("Portal shape is still rectangular now.")
+                        Component.translatable("imm_ptl.msg.shape_still_rectangular")
                     );
                 }
                 return;
@@ -2737,7 +2736,7 @@ public class PortalCommand {
             if (Math.abs(meshArea) < 0.00001) {
                 if (player != null) {
                     player.sendSystemMessage(
-                        Component.literal("Sculpt failed because the blocks fully cover the portal.")
+                        Component.translatable("imm_ptl.msg.sculpt_failed_covered")
                     );
                 }
                 return;
@@ -2765,9 +2764,9 @@ public class PortalCommand {
         future.exceptionally(throwable -> {
             LOGGER.error("Error when sculpting portal {}", portal, throwable);
             if (player != null) {
-                player.sendSystemMessage(Component.literal(
-                    "Failed to sculpt the portal. See the server log for detail."
-                ));
+                player.sendSystemMessage(
+                    Component.translatable("imm_ptl.msg.sculpt_failed_see_log")
+                );
             }
             return null;
         });

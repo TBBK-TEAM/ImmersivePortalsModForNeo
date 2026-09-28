@@ -54,7 +54,7 @@ public class PortalAnimationCommand {
                     portal, Portal::pauseAnimation
                 );
                 PortalCommand.reloadPortal(portal);
-                context.getSource().sendSuccess(() -> Component.literal("Paused"), false);
+                context.getSource().sendSuccess(() -> Component.translatable("imm_ptl.msg.animation.paused"), false);
             }))
         );
         
@@ -64,7 +64,7 @@ public class PortalAnimationCommand {
                     portal, Portal::resumeAnimation
                 );
                 PortalCommand.reloadPortal(portal);
-                context.getSource().sendSuccess(() -> Component.literal("Resumed"), false);
+                context.getSource().sendSuccess(() -> Component.translatable("imm_ptl.msg.animation.resumed"), false);
             }))
         );
         
@@ -77,7 +77,7 @@ public class PortalAnimationCommand {
                             portal, Portal::pauseAnimation
                         );
                         context.getSource().sendSuccess(() -> 
-                            Component.literal("Paused " + portal),
+                            Component.translatable("imm_ptl.msg.animation.paused_portal", portal),
                             false
                         );
                     }
@@ -105,7 +105,7 @@ public class PortalAnimationCommand {
                     }
                     else {
                         context.getSource().sendFailure(
-                            Component.literal("Invalid index " + index)
+                            Component.translatable("imm_ptl.msg.animation.invalid_index", index)
                         );
                     }
                 }))
@@ -123,7 +123,7 @@ public class PortalAnimationCommand {
                 }
                 else {
                     context.getSource().sendFailure(
-                        Component.literal("No animation")
+                        Component.translatable("imm_ptl.msg.animation.no_animation")
                     );
                 }
             }))
@@ -184,7 +184,7 @@ public class PortalAnimationCommand {
                                         PortalCommand.reloadPortal(portal);
                                     }
                                     else {
-                                        context.getSource().sendFailure(Component.literal("the entity is not a portal"));
+                                        context.getSource().sendFailure(Component.translatable("imm_ptl.msg.not_a_portal_entity"));
                                     }
                                 }
                                 
@@ -234,7 +234,7 @@ public class PortalAnimationCommand {
                                             PortalCommand.reloadPortal(portal);
                                         }
                                         else {
-                                            context.getSource().sendFailure(Component.literal("the entity is not a portal"));
+                                            context.getSource().sendFailure(Component.translatable("imm_ptl.msg.not_a_portal_entity"));
                                         }
                                     }
                                     
@@ -381,7 +381,7 @@ public class PortalAnimationCommand {
                     AnimationBuilderContext animationBuilderContext = getAnimationBuilderContext(portal);
                     
                     if (animationBuilderContext == null) {
-                        context.getSource().sendFailure(Component.literal("No animation to build"));
+                        context.getSource().sendFailure(Component.translatable("imm_ptl.msg.animation.no_animation_to_build"));
                         return;
                     }
                     
@@ -390,7 +390,7 @@ public class PortalAnimationCommand {
                     List<NormalAnimation.Phase> phases = thisSideAnimation.phases;
                     
                     if (index >= phases.size()) {
-                        context.getSource().sendFailure(Component.literal("Index out of range"));
+                        context.getSource().sendFailure(Component.translatable("imm_ptl.msg.index_out_of_range"));
                         return;
                     }
                     
@@ -437,7 +437,7 @@ public class PortalAnimationCommand {
         AnimationBuilderContext animationBuilderContext = getAnimationBuilderContext(portal);
         
         if (animationBuilderContext == null) {
-            context.getSource().sendFailure(Component.literal("No animation to build"));
+            context.getSource().sendFailure(Component.translatable("imm_ptl.msg.animation.no_animation_to_build"));
             return;
         }
         
@@ -448,7 +448,7 @@ public class PortalAnimationCommand {
         UnilateralPortalState otherSideReferenceState = animation.otherSideReferenceState;
         
         if (thisSideReferenceState == null || otherSideReferenceState == null) {
-            context.getSource().sendFailure(Component.literal("No reference state"));
+            context.getSource().sendFailure(Component.translatable("imm_ptl.msg.animation.no_reference_state"));
             return;
         }
         
@@ -559,7 +559,7 @@ public class PortalAnimationCommand {
         AnimationBuilderContext animationBuilderContext = getAnimationBuilderContext(portal);
         
         if (animationBuilderContext == null) {
-            context.getSource().sendFailure(Component.literal("No animation to build"));
+            context.getSource().sendFailure(Component.translatable("imm_ptl.msg.animation.no_animation_to_build"));
             return;
         }
         
@@ -567,7 +567,7 @@ public class PortalAnimationCommand {
         List<NormalAnimation.Phase> otherSidePhases = animationBuilderContext.otherSideAnimation().get().phases;
         
         if (thisSidePhases.isEmpty() || otherSidePhases.isEmpty()) {
-            context.getSource().sendFailure(Component.literal("No phase"));
+            context.getSource().sendFailure(Component.translatable("imm_ptl.msg.animation.no_phase"));
             return;
         }
         

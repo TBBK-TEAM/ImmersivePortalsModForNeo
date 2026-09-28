@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -51,7 +52,7 @@ public class OverlayRendering {
         if (IrisInterface.invoker.isShaders()) {
             if (!shaderOverlayWarned) {
                 shaderOverlayWarned = true;
-                CHelper.printChat("[Immersive Portals] Portal overlay cannot be rendered with shaders");
+                CHelper.printChat(Component.translatable("imm_ptl.msg.overlay_not_supported_with_shaders"));
             }
 
             return;

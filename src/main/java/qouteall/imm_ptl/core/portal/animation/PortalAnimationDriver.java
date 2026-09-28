@@ -80,6 +80,6 @@ public interface PortalAnimationDriver {
     }
     
     default Component getInfo() {
-        return Component.literal("Unknown Animation");
+        return Component.translatable("imm_ptl.msg.unknown_animation");
     }
 }

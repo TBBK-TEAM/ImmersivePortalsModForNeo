@@ -28,7 +28,7 @@ public class TimingFunctionArgumentType implements ArgumentType<TimingFunction> 
     
     public static final DynamicCommandExceptionType exceptionType =
         new DynamicCommandExceptionType(object ->
-            Component.literal("Invalid Timing Function "+object)
+            Component.translatable("imm_ptl.msg.invalid_timing_function", object)
         );
     
     public static TimingFunction get(CommandContext<?> context, String argName) {
